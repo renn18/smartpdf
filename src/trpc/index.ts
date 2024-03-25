@@ -24,8 +24,8 @@ export const appRouter = router({
         await db.user.create({
           data: {
             id: user.id,
-            email: user.email
-          }
+            email: user.email,
+          },
         })
       }
 
@@ -37,8 +37,8 @@ export const appRouter = router({
     
     return await db.file.findMany({
       where: {
-        userId
-      }
+        userId,
+      },
     })
   }),
 
@@ -50,7 +50,7 @@ export const appRouter = router({
       const file = await db.file.findFirst({
         where: {
           key: input.key,
-          userId 
+          userId, 
         },
       })
 

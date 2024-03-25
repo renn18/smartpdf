@@ -36,7 +36,7 @@ enum UploadStatus {
 model File {
   id String @id @default(cuid()) @map("_id")
   name String
-  user UploadStatus @default(PENDING)
+  uploadStatus UploadStatus @default(PENDING)
   url String
   key String
   createdAt DateTime @default(now())
