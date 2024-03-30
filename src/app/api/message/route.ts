@@ -49,7 +49,7 @@ export const POST = async (req: NextRequest) => {
         })
 
         const pinecone = await getPineconeClient()  
-        const pineconeIndex = pinecone.Index('smartpdf')
+        const pineconeIndex = pinecone.Index('renn')
 
         const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
             pineconeIndex,
