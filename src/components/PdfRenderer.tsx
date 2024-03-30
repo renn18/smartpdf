@@ -35,6 +35,9 @@ const PdfRenderer = ({url}: PdfRendererProps) => {
     const [currPage, setCurrPage] = useState<number>(1)
     const [scale, setScale] = useState<number>(1)
     const [rotation, setRotation] = useState<number>(0)
+    const [renderedScale, setRenderedScale] = useState<number | null>(null)
+
+    const isLoading = renderedScale !== scale
 
     const CustomPageValidator = z.object({
         page: z.string().refine((num) => Number(num) > 0 && Number(num) <= numPages!),
@@ -60,8 +63,11 @@ const PdfRenderer = ({url}: PdfRendererProps) => {
         <div className="w-full bg-white rounded-md shadow flex flex-col items-center">
             <div className="h-14 w-full border-b border-zinc-200 flex items-center justify-between px-2">
                 <div className="flex items-center gap-1.5">
+
+                    {/* Button descrease */}
                     <Button disabled={currPage <= 1} onClick={() => {
                         setCurrPage((prev) => (prev - 1 > 1 ? prev - 1 : 1))
+                        setValue("page", String(currPage - 1))
                     }} variant='ghost' aria-label='previous page'>
                         <ChevronDown className="h-4 w-4" />
                     </Button>
@@ -78,8 +84,10 @@ const PdfRenderer = ({url}: PdfRendererProps) => {
                         </p>
                     </div>
 
+                    {/* Button increase */}
                     <Button disabled={numPages === undefined || currPage === numPages} onClick={() => {
                         setCurrPage((prev) => prev + 1 > numPages! ? numPages! : prev + 1);
+                        setValue("page", String(currPage + 1))
                     }} variant='ghost' aria-label='next page'>
                         <ChevronUp className="h-4 w-4" />
                     </Button>
@@ -113,7 +121,7 @@ const PdfRenderer = ({url}: PdfRendererProps) => {
                         <RotateCw className="h-4 w-4" />
                     </Button>
 
-                    <PdfFullScreen />
+                    <PdfFullScreen fileUrl={url} />
                 </div>
             </div>
 
@@ -133,10 +141,35 @@ const PdfRenderer = ({url}: PdfRendererProps) => {
                                 variant: 'destructive',
                             })
                         }}
-                        onLoadSuccess={({numPages}) => setNumPages(numPages)}
+                        onLoadSuccess={({numPages}) => 
+                            setNumPages(numPages)
+                        }
                         file={url} 
                         className="max-h-full">
-                        <Page width={width ? width : 1} pageNumber={currPage} scale={scale} rotate={rotation}/>
+                        {isLoading && renderedScale ? (
+                            <Page 
+                                width={width ? width : 1} 
+                                pageNumber={currPage} 
+                                scale={scale} 
+                                rotate={rotation}
+                                key={"@" + renderedScale}
+                            />
+                        ) : null}
+
+                        <Page 
+                            className={cn(isLoading ? "hidden" : "")}
+                            width={width ? width : 1}
+                            pageNumber={currPage}
+                            scale={scale}
+                            rotate={rotation}
+                            key={"@" + scale}
+                            loading={
+                                <div className="flex justify-center">
+                                    <Loader2 className="my-24 h-6 w-6 animate-spin"/>
+                                </div>
+                            }
+                            onRenderSuccess={() => setRenderedScale(scale)}
+                        />
                     </Document>
                 </div>
                 </SimpleBar>
